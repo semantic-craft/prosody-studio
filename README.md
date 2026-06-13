@@ -27,4 +27,4 @@ NOTES.md                  # 溯源 + 待办
 
 ## 状态
 
-**Phase 1（拷核心 + 建骨架）已完成；尚不保证编译** —— 见 `NOTES.md`。让它真正构建/跑起来 = Phase 3。
+**Phase 3 已完成（2026-06-14）：mac + iOS 两个 target 都 `BUILD SUCCEEDED`。** Core 用 responsay 最后绿提交的完整版（先带全后剪）；TTS/ASR 暂为桩，法律/OCR/输入法为暂时负重。收拾负重 + 接真引擎 + 基于 fluent 重设计 = Phase 4。详见 `NOTES.md`。

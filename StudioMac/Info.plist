@@ -20,11 +20,9 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>用于跟读发音的音高与升降调反馈。</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>用于识别你的跟读以做对比。</string>
-	<key>UILaunchScreen</key>
-	<dict/>
 </dict>
 </plist>

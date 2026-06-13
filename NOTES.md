@@ -30,13 +30,23 @@
 - ResponsaySpeech：Volcengine / FunASR / CloudQwen 云端听写 ASR
 - Package.swift：移除 `LegalBrain/LegalSkills` 资源引用 + `ResponsayMaintenance` 维护 CLI
 
-## 待办（Phase 3 — 让它真正跑起来）
+## Phase 3 — 让它编过跑起来（已完成 2026-06-14）
 
-- [ ] 重命名包/模块 `ResponsayCore`→`StudioCore`、`ResponsaySpeech`→`StudioSpeech`（现保留原名以使拷来的 `import` 不破）
-- [ ] 修剪被删目录留下的悬挂引用，使 StudioCore 编译通过
-- [ ] 剪 Tests/ 里属于已删模块的死测试
-- [ ] 验证 `project.yml` 能 `xcodegen generate` 并 build mac/iOS target
-- [ ] 折入 Qwen 端点修复（见上）
-- [ ] 基于 reference/fluent 的 LEARNING_SYSTEM / PRACTICE 重做 macOS app 设计
+**关键发现**：responsay 的 `ResponsayCore` 是个**单体包**——韵律域、地基、法律、OCR、输入法全在一个 SPM target 里互相依赖。Phase 1 的「curated 子集」（删了 legal/OCR/输入法目录）导致 **5481 个悬挂引用**（StylePack/Persistence/Services/LLM/TTS 都引用被删类型）。干净抽出韵律域 = 要把单体拆成子包 = 大重构，非机械。
 
-> **状态**：Phase 1 = 拷核心 + 建骨架。**不保证编译**（设计如此）。Package.swift 的 manifest 已 `swift package dump-package` 校验合法。
+**采用的解法（先带全后剪）**：用最后绿的 `c42bbce7`（含韵律域 + Qwen 端点修复）的**完整 Core** 替换 curated 版 → 包立即编过。法律/OCR/输入法作为暂时负重，留待 fluent 重设计时剪。
+
+- ✅ **StudioCore 包**：`swift build` 通过（26 模块，含韵律域）。
+- ✅ **StudioiOS**：`** BUILD SUCCEEDED **`（用拷来的 iOS 壳 + 完整 Core）。
+- ✅ **StudioMac**：`** BUILD SUCCEEDED **`。补了 `@main` 壳 `StudioMac/App/ProsodyStudioApp.swift`（TabView 托两个屏）+ app-glue 垫片 `StudioAppGlue.swift`（`Diag`→OSLog、`TTSEngine`→stub）+ `PracticeSpeechRecorder` 改 stub（录音真、转写桩）——避开 sherpa-onnx 原生链 + BYOK 凭据链。
+- Qwen 端点修复随 `c42bbce7` 一并带入（无需单独折入）。
+
+## 待办（Phase 4 — 收拾负重 + 真正成形）
+
+- [ ] **剪单体负重**：把 Core 拆成子包 / 删韵律 app 用不到的 legal/OCR/输入法/云听写模块（需依赖闭包分析）。
+- [ ] **接真引擎**：把 `TTSEngine`/`PracticeSpeechRecorder` 垫片换成真 TTS（朗读）+ 真 ASR（跟读转写），跑通音高/升降调对比反馈。
+- [ ] 重命名包 `ResponsayCore`→`StudioCore`（现保留原名使 `import` 不破）。
+- [ ] 基于 `reference/fluent`（LEARNING_SYSTEM / PRACTICE 方法论）重做 macOS app 设计。
+- [ ] HITL：真机麦克风跑一遍跟读/朗读（headless 测不了音频）。
+
+> **状态**：Phase 1（拷核心）→ Phase 2（瘦身 responsay，已合 main）→ **Phase 3（两 target 编过，本仓）已完成**。负重未剪、引擎为桩——设计上先跑起来，成形是 Phase 4。
