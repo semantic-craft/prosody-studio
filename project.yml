@@ -1,0 +1,61 @@
+# XcodeGen manifest — prosody-studio (Phase 1 skeleton, NOT yet verified to build).
+# Run `xcodegen generate` to produce the .xcodeproj (gitignored). Phase 3 finalizes this.
+name: ProsodyStudio
+options:
+  bundleIdPrefix: com.semanticcraft.prosodystudio
+  createIntermediateGroups: true
+  deploymentTarget:
+    macOS: "14.0"
+    iOS: "18.0"
+packages:
+  ResponsayCore:                # TODO Phase 3: rename to StudioCore
+    path: Packages/ResponsayCore
+targets:
+  # macOS 练习室 —— UI 已拷入；缺 @main app 壳（Phase 3 补）。
+  StudioMac:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: StudioMac
+    dependencies:
+      - package: ResponsayCore
+        product: ResponsayCore
+      - package: ResponsayCore
+        product: ResponsaySpeech
+    info:
+      path: StudioMac/Info.plist
+      properties:
+        CFBundleDisplayName: "Prosody Studio"
+        LSMinimumSystemVersion: "14.0"
+        NSMicrophoneUsageDescription: "用于跟读发音的音高与升降调反馈。"
+
+  # iOS 壳 —— 从 responsay Responsay/ 搬来的种子（含 @main）。
+  StudioiOS:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: StudioiOS
+    dependencies:
+      - package: ResponsayCore
+        product: ResponsayCore
+      - package: ResponsayCore
+        product: ResponsaySpeech
+    info:
+      path: StudioiOS/Info.plist
+      properties:
+        CFBundleDisplayName: "Prosody Studio"
+        UILaunchScreen: {}
+        NSMicrophoneUsageDescription: "用于跟读发音的音高与升降调反馈。"
+        NSSpeechRecognitionUsageDescription: "用于识别你的跟读以做对比。"
+
+schemes:
+  StudioMac:
+    build:
+      targets:
+        StudioMac: all
+  StudioiOS:
+    build:
+      targets:
+        StudioiOS: all
