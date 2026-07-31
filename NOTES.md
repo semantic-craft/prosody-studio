@@ -22,7 +22,7 @@
 | 语音地基 | ResponsaySpeech：AppleSpeechCaptureService · CloudTTS · RealtimeAudioSink · AudioInputDeviceSelector |
 | 练习室 UI | StudioMac/MainWindow 7 文件 + Theme/SettingsTheme + DesignSystem/* |
 | iOS 壳 | StudioiOS/（responsay `Responsay/` 整套：App/Features/Services/DesignSystem） |
-| 设计参照 | reference/fluent（m98/fluent，浅克隆，已 gitignore） |
+| 学习闭环 | `docs/specs/learning-loop.md`（受 MIT 项目 m98/fluent 启发，已独立改写；不保留本地克隆） |
 
 ## 已剪（§2 边界：留在 responsay，不进本仓）
 
@@ -34,7 +34,7 @@
 
 **关键发现**：responsay 的 `ResponsayCore` 是个**单体包**——韵律域、地基、法律、OCR、输入法全在一个 SPM target 里互相依赖。Phase 1 的「curated 子集」（删了 legal/OCR/输入法目录）导致 **5481 个悬挂引用**（StylePack/Persistence/Services/LLM/TTS 都引用被删类型）。干净抽出韵律域 = 要把单体拆成子包 = 大重构，非机械。
 
-**采用的解法（先带全后剪）**：用最后绿的 `c42bbce7`（含韵律域 + Qwen 端点修复）的**完整 Core** 替换 curated 版 → 包立即编过。法律/OCR/输入法作为暂时负重，留待 fluent 重设计时剪。
+**采用的解法（先带全后剪）**：用最后绿的 `c42bbce7`（含韵律域 + Qwen 端点修复）的**完整 Core** 替换 curated 版 → 包立即编过。法律/OCR/输入法作为暂时负重，按学习闭环规格的边界留待 issue 005 剪除。
 
 - ✅ **StudioCore 包**：`swift build` 通过（26 模块，含韵律域）。
 - ✅ **StudioiOS**：`** BUILD SUCCEEDED **`（用拷来的 iOS 壳 + 完整 Core）。
@@ -46,7 +46,7 @@
 - [ ] **剪单体负重**：把 Core 拆成子包 / 删韵律 app 用不到的 legal/OCR/输入法/云听写模块（需依赖闭包分析）。
 - [ ] **接真引擎**：把 `TTSEngine`/`PracticeSpeechRecorder` 垫片换成真 TTS（朗读）+ 真 ASR（跟读转写），跑通音高/升降调对比反馈。
 - [ ] 重命名包 `ResponsayCore`→`StudioCore`（现保留原名使 `import` 不破）。
-- [ ] 基于 `reference/fluent`（LEARNING_SYSTEM / PRACTICE 方法论）重做 macOS app 设计。
+- [ ] 评审并冻结 `docs/specs/learning-loop.md`；草案已把 Fluent 方法论收束为英语口语的习得/提取双闭环，并明确 macOS / iOS 信息架构。
 - [ ] HITL：真机麦克风跑一遍跟读/朗读（headless 测不了音频）。
 
 > **状态**：Phase 1（拷核心）→ Phase 2（瘦身 responsay，已合 main）→ **Phase 3（两 target 编过，本仓）已完成**。负重未剪、引擎为桩——设计上先跑起来，成形是 Phase 4。
